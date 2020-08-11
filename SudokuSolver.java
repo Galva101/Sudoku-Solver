@@ -37,7 +37,7 @@ class SudokuTile {
 
 }
 
-public class Sudoku {
+public class SudokuSolver {
 
 	public static ArrayList<Integer> generateCompliment(int x){
 
@@ -51,7 +51,8 @@ public class Sudoku {
 
 	}
 
-	public static void checkAndReduceNumber (SudokuTile[][] sudoku) {
+	public static boolean checkAndReduceNumber (SudokuTile[][] sudoku) {
+		boolean updated = false;
 		for(int y=0; y<9; y++) { 
 			for(int x=0; x<9; x++) { //select start tile
 
@@ -172,6 +173,7 @@ public class Sudoku {
 						if(!otherTileSharesValue) {//no other tile can be this specific value, so this x/y tile must have it
 							valueFound=true;
 							sudoku[y][x].setValue(valueToCheck);
+							updated = true;
 						}
 					}
 
@@ -181,6 +183,7 @@ public class Sudoku {
 					if(sudoku[y][x].numberlist.size()==1){
 						int valueToBeSet = sudoku[y][x].numberlist.get(0); //only one value left
 						sudoku[y][x].setValue(valueToBeSet);
+						updated = true;
 					}
 
 				}//end if
@@ -188,11 +191,12 @@ public class Sudoku {
 
 			}
 		}
+		return updated;
 
 	}
 
 	public static void recursiveSolve(SudokuTile[][] original, SudokuTile[][] copy){
-		if( verifySudoku(copy)){ //copy is a valid sudoku solution, stop recursion and overwrite the original using references
+		if( verifySudoku(copy) ){ //copy is a valid sudoku solution, stop recursion and overwrite the original using references
 			original = copy;
 			System.out.println("found solution");
 
@@ -210,8 +214,14 @@ public class Sudoku {
 							SudokuTile[][] n =  new SudokuTile[9][9];
 							initialiseSudoku(n);
 							copySudoku(copy, n); //we now work on a new sudoku "n" to avoid reference conflicts
-							n[x][y].setValue( number ); //set the empty slot of the new n-sudoku to the i-th value of possible numbers in the copy-sudoku
 							
+							n[x][y].setValue(number);
+
+							boolean hasBeenUpdated = true;
+							while(hasBeenUpdated){
+								hasBeenUpdated =  checkAndReduceNumber(n);
+							}
+									
 							printSudokuToConsole(copy);
 							// System.out.println(x + " " +y +", in " + copy[x][y].numberlist);
 							// System.out.println("and adding " + copy[x][y].numberlist.get(i));
@@ -219,7 +229,6 @@ public class Sudoku {
 							System.out.println("n is now a " + verifySudoku(n) + " sudoku \n\n");
 
 							recursiveSolve(original, n); //pass that new n-sudoku into a recursive call, to continue filling the values
-
 						}
 					}				
 				}
@@ -282,6 +291,53 @@ public class Sudoku {
 		return allSet;
 	}
 
+	public static boolean numberCanBeSet(SudokuTile[][] s, int n, int x, int y){
+		boolean canBeSet = true;
+
+		for( int row = 0; row<9; row ++){ //verify row
+			if( s[y][row].value == n){
+				canBeSet=false;
+			}
+		}
+
+		for( int col = 0; col<9; col ++){ //verify row
+			if( s[col][x].value == n){
+				canBeSet=false;
+			}
+		}
+
+		//verify blocks
+		int blockX =0;
+		int blockY=0;
+
+		if(x<=2) {
+			blockX=0;
+		}else if (x<=5) {
+			blockX=3;
+		}else {
+			blockX=6;
+		}
+
+		if(y<=2) {
+			blockY=0;
+		}else if(y<=5) {
+			blockY=3;
+		}else {
+			blockY=6;
+		}
+
+		for(int squareY=blockY; squareY<blockY+3; squareY++) {
+			for(int squareX=blockX; squareX<blockX+3; squareX++) {
+				if(s[blockY][blockX].value == n){
+					canBeSet = false;
+				}
+			}
+		}//end simple block check
+		
+		
+		return canBeSet;
+	}
+
 	public static void buildSudoku(int[][] template, SudokuTile[][] target) { //copy sudoku int array values if they are not zero
 
 		for(int i=0; i<9; i++) { 
@@ -304,7 +360,12 @@ public class Sudoku {
 	public static void copySudoku( SudokuTile[][] source,  SudokuTile[][] target ) {		
 		for( int i =0; i<9; i++){
 			for( int j =0; j<9; j++){
-				target[i][j].setValue(source[i][j].value);
+				if(source[i][j].set){
+					target[i][j].setValue(source[i][j].value);
+					for( int k = 0; k< source[i][j].numberlist.size() ; k++){
+						target[i][j].numberlist.add(  source[i][j].numberlist.get(k) );
+					}
+				}				
 			}
 		}
 	}
@@ -449,26 +510,38 @@ public class Sudoku {
 		// copySudoku(table, x);
 		// x[8][8].setValue(90);
 		// printSudokuToConsole(x);
+	
+		// if(!verifySudoku(table)){
+		// 	for(int i =0; i<100; i++) {
+		// 		checkAndReduceNumber(table);
+		// 	}
+		// }
 
-
-
-		for(int i =0; i<100; i++) {
-			checkAndReduceNumber(table);
-
-			//			printSudokuToConsole(table);
-			//			System.out.println();
-
+		boolean hasBeenUpdated = true;
+		while(hasBeenUpdated){
+			hasBeenUpdated =  checkAndReduceNumber(table);
 		}
 
-		// table[8][8].setValue(9);
+		if(!verifySudoku(table)){
 
-		System.out.println("valid sudoku: " +verifySudoku(table));
+			SudokuTile[][] copy = new SudokuTile[9][9];
+			initialiseSudoku(copy);
+			copySudoku(table, copy);
+	
+			recursiveSolve(table, copy);
+			printSudokuToConsole(table);
+		}
 
-		recursiveSolve(table, table);
-		printSudokuToConsole(table);
-		
+		if(verifySudoku(table)){
+			System.out.println("Fund Solution :");
+			printSudokuToConsole(table);
+		}else{
+			System.out.println("No Solution Could be Found");
+			printSudokuToConsole(table);
+		}
 
-		// System.out.println(table[4][4].numberlist);
+
+
 	}
 
 }
