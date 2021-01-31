@@ -128,7 +128,7 @@ public class SudokuSolver {
                     for(int n=1; n<10; n++){
                         if(possible(y,x,n,s)){
                             s[y][x]=n;
-                            printSudoku(s);
+//                            printSudoku(s);
                             solve(s);
                             if(verifySudoku(s)){
                                 return s;
