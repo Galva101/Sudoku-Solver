@@ -1,5 +1,5 @@
 public class SudokuSolver {
-    public  static int[][] sudoku1 = {  //Here are five sudokus to test the program on
+    public  static int[][] sudoku1 = {  //Here are seven sudokus to test the program on
             {9,0,0,1,0,0,0,0,5},
             {0,0,5,0,9,0,2,0,1},
             {8,0,0,0,4,0,0,0,0},
@@ -55,6 +55,30 @@ public class SudokuSolver {
             {0, 0, 2, 0, 0, 0, 7, 0, 0},
             {0, 0, 0, 0, 0, 0, 0, 8, 0},
             {3, 0, 0, 5, 0, 0, 0, 0, 9}};
+
+     public static int[][] sudoku6 =  {
+             {0,0,8,1,0,0,7,0,0},
+             {0,3,0,0,8,0,0,0,0},
+             {2,0,4,0,0,0,0,0,9},
+             {0,0,0,3,5,0,0,0,0},
+             {0,7,0,0,0,8,0,0,0},
+             {0,0,0,0,0,9,8,4,0},
+             {0,0,0,0,2,0,0,0,6},
+             {0,0,0,9,0,1,0,3,0},
+             {9,0,2,0,0,7,0,0,0},
+     };
+
+     public static int[][]  sudoku7 = {
+            {0,0,6,8,0,0,0,2,0},
+            {0,0,0,0,0,0,5,0,0},
+            {4,0,5,0,7,0,0,0,0},
+            {0,0,0,0,8,2,9,0,0},
+            {7,0,2,1,0,0,8,0,0},
+            {0,0,0,6,0,0,0,5,3},
+            {9,0,0,0,0,1,7,0,0},
+            {0,0,0,5,0,0,0,0,0},
+            {6,0,4,0,0,0,0,0,2},
+     };
 
 
     public static boolean possible (int y , int x, int n, int[][] s){ //this method returns a boolean value to indicate if a number can be set on a field at coordinates x and y
