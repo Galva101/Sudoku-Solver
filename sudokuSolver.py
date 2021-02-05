@@ -1,12 +1,12 @@
-def possible(y, x, n, s):
-    for i in range(0, 9):
+def possible(y, x, n, s): #this method returns a boolean value to indicate if a number can be set on a field at coordinates x and y
+    for i in range(0, 9): #first we check both axes
         if s[y][i] == n:
             return False
     for i in range(0, 9):
         if s[i][x] == n:
             return False
 
-    xBlock = (x // 3) * 3
+    xBlock = (x // 3) * 3 #here we calculate the block that we are probing, and check all cells within it
     yBlock = (y // 3) * 3
 
     for i in range(0, 3):
@@ -17,7 +17,7 @@ def possible(y, x, n, s):
     return True
 
 
-def verifySudoku(s):
+def verifySudoku(s): #this simple verify method iterates over the field to check if there are no zeroes left
     for y in range(0, 9):
         for x in range(0, 9):
             if s[y][x] == 0:
@@ -26,6 +26,10 @@ def verifySudoku(s):
 
 
 def solve(s):
+    # This method works by iterating over the field, until it encounters a zero, then it tries the
+    # 9 numbers that could be there, for each it attempts it, then it passes the new field to the method again, should there
+    # at some point be an error, it sets the attempted cell back to zero and abandons this call by returning the unaltered field (backtracking).
+    # If the verification succeeds, we return the current field, as this is the solution.
     for y in range(0, 9):
         for x in range(0, 9):
             if s[y][x] == 0:
